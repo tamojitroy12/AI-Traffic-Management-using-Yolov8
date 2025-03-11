@@ -12,7 +12,7 @@ vehicle_model = YOLO("yolov8n.pt")  # Detect vehicles
 plate_model = YOLO("license_plate.pt")  # Detect license plates
 helmet_model = YOLO("helmet.pt")  # Detect helmets
 traffic_model = YOLO("meta_yolo.pt")  # Detect traffic signals
-detection_model = YOLO("ViolationDetect.pt")  # Enhanced detection
+
 
 # Initializeing the DeepSORT tracker
 tracker = DeepSort(max_age=30)
@@ -153,21 +153,6 @@ def process_frame(frame):
                     traffic_label = traffic_model.names[int(class_id)]
                     cv2.rectangle(frame, (tx1, ty1), (tx2, ty2), (255, 0, 0), 2)
                     cv2.putText(frame, traffic_label, (tx1, ty1 - 10), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-        
-        # Object Detection
-        detection_results = detection_model(frame)
-        for detection_result in detection_results:
-            detection_boxes = detection_result.boxes.xyxy.cpu().numpy()
-            detection_class_ids = detection_result.boxes.cls.cpu().numpy()
-            detection_confidences = detection_result.boxes.conf.cpu().numpy()
-
-            for box, class_id, conf in zip(detection_boxes, detection_class_ids, detection_confidences):
-                if conf > 0.5:
-                    tx1, ty1, tx2, ty2 = map(int, box)
-                    detection_label = detection_model.names[int(class_id)]
-                    cv2.rectangle(frame, (tx1, ty1), (tx2, ty2), (255, 0, 0), 2)
-                    cv2.putText(frame, detection_label, (tx1, ty1 - 10), 
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
 
         cv2.imshow("AI Traffic Management System", frame)
